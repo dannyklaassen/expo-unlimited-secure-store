@@ -1,8 +1,15 @@
 {
-  "name": "expo-unlimited-secure-store",
+  "name": "@neverdull-agency/expo-unlimited-secure-store",
   "version": "1.0.0",
   "description": "An 'unlimited' secure store for expo projects, also compatible with redux. (Expo's SecureStore was limited to 2KB in SDK v33)",
   "main": "index.js",
+  "peerDependencies": {
+    "expo-file-system": "^5.0.1",
+    "expo-secure-store": "^5.0.1"
+  },
+  "dependencies": {
+    "crypto-js": "^3.1.9-1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -26,12 +33,5 @@
   "bugs": {
     "url": "https://github.com/neverdull-agency/expo-unlimited-secure-store/issues"
   },
-  "homepage": "https://github.com/neverdull-agency/expo-unlimited-secure-store#readme",
-  "peerDependencies": {
-    "expo-file-system": "^5.0.1",
-    "expo-secure-store": "^5.0.1"
-  },
-  "dependencies": {
-    "crypto-js": "^3.1.9-1"
-  }
+  "homepage": "https://github.com/neverdull-agency/expo-unlimited-secure-store#readme"
 }
