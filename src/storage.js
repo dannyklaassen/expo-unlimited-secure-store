@@ -82,7 +82,7 @@ export const removeAsync = async (key, secureStoreOptions) => {
                 await FileSystem.deleteAsync(currentStorageFileUri);
             } 
 
-            await SecureStore.removeItem(key, secureStoreOptions);
+            await SecureStore.deleteItemAsync(key, secureStoreOptions);
 
             resolve();
         } catch (e) {
