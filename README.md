@@ -4,7 +4,7 @@ Key-Value based secured storage engine for applications built with [Expo](https:
 
 Given data is encrypted (AES256) and saved to application's sandbox with Expo's [FileSystem](https://docs.expo.io/versions/latest/sdk/filesystem/) and the encryption keys are stored in Expo's [SecureStore](https://docs.expo.io/versions/latest/sdk/securestore/).
 
-Main reason for creating this module is limitations of SecureStore starting from SDK 33:
+Main reason for creating this module is that Expo's SecureStore will have limitations starting from SDK 35:
 
 > Size limit for a value is 2048 bytes. An attempt to store larger values may fail. Currently, we print a warning when the limit is reached, but we will throw an error starting from SDK 35.
 
@@ -146,6 +146,6 @@ Returns a `Promise` wich will reject in case of errors.
 
 ## Note
 
-Inspired by [redux-persist-expo-securestore](https://github.com/Cretezy/redux-persist-expo-securestore) which saved data with Expo's SecureStore, that has been limited to 2KB per entry from SDK 33.
+Inspired by [redux-persist-expo-securestore](https://github.com/Cretezy/redux-persist-expo-securestore) which saved data with Expo's SecureStore, that will be limited to 2KB per entry from SDK 35.
 
 
