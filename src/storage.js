@@ -7,13 +7,42 @@ import * as AES from './aes';
 const storageFileUriKey = 'storage_file_uri';
 const storageDirectoryUri = `${FileSystem.documentDirectory}persist-storage/`;
 
-export const createDirectory = () => {
-    FileSystem.getInfoAsync(storageDirectoryUri)
-    .then(({ exists }) => {
-        if (!exists) {
-            FileSystem.makeDirectoryAsync(storageDirectoryUri, { intermediates: true });
+export const createDirectory = async () => {
+    const { exists } = await FileSystem.getInfoAsync(storageDirectoryUri);
+    if (!exists) {
+        await FileSystem.makeDirectoryAsync(storageDirectoryUri, { intermediates: true });
+    }
+};
+
+export const tryDataRecovery = async (secureStoreOptions) => {
+    const storageFileUri = await SecureStore.getItemAsync(storageFileUriKey, secureStoreOptions);
+    if (storageFileUri.startsWith('file://')) {
+        // Full paths is stored, means it's older version
+        let storageString;
+        const { exists } = await FileSystem.getInfoAsync(storageFileUri);
+        if (exists) {
+            // File exists at path, try to read contents
+            storageString = await FileSystem.readAsStringAsync(storageFileUri);
+            await FileSystem.deleteAsync(storageFileUri);
+        } else {
+            // File doesn't exists at path, documents dir may have changed
+            const fileName = storageFileUri.split('persist-storage/')[1];
+            const modifiedUri = `${storageDirectoryUri}${fileName}`;
+            const { exists } = await FileSystem.getInfoAsync(modifiedUri);
+            if (exists) {
+                storageString = await FileSystem.readAsStringAsync(modifiedUri);
+                await FileSystem.deleteAsync(modifiedUri);
+            }
         }
-    });
+
+        if (storageString) {
+            // Storage could be read, save in new format
+            const newStorageFileName = uuid();
+            const newStorageFileUri = `${storageDirectoryUri}${newStorageFileName}`;
+            await FileSystem.writeAsStringAsync(newStorageFileUri, storageString);
+            await SecureStore.setItemAsync(storageFileUriKey, newStorageFileName, secureStoreOptions);
+        }
+    }
 };
 
 export const getAsync = async (key, secureStoreOptions) => {
@@ -51,7 +80,7 @@ export const setAsync = async (key, value, secureStoreOptions) => {
             storage = { ...storage, [key]: encryptedData };
             const storageString = JSON.stringify(storage);
 
-            const newStorageFileUri = await generateStorageFileUri();
+            const newStorageFileName = uuid();
             await FileSystem.writeAsStringAsync(newStorageFileUri, storageString);
             await SecureStore.setItemAsync(storageFileUriKey, newStorageFileUri, secureStoreOptions);
             await SecureStore.setItemAsync(key, encryptionKey, secureStoreOptions);
@@ -76,7 +105,7 @@ export const removeAsync = async (key, secureStoreOptions) => {
                 delete storage.key;
                 storageString = JSON.stringify(storage);
 
-                const newStorageFileUri = await generateStorageFileUri();
+                const newStorageFileName = uuid();
                 await FileSystem.writeAsStringAsync(newStorageFileUri, storageString);
                 await SecureStore.setItemAsync(storageFileUriKey, newStorageFileUri, secureStoreOptions);
                 await FileSystem.deleteAsync(currentStorageFileUri);
@@ -89,10 +118,4 @@ export const removeAsync = async (key, secureStoreOptions) => {
             reject(e);
         }
     });
-};
-
-const generateStorageFileUri = async () => {
-    const fileName = uuid();
-    const uri = `${storageDirectoryUri}${fileName}`;
-    return uri;
 };

@@ -1,11 +1,12 @@
 import * as Storage from './storage';
 import * as DefaultOptions from './options';
 
-const createSecureStorage = (options = {}) => {
+const createSecureStorage = async (options = {}) => {
     const replacementCharacter = options.replacementCharacter || DefaultOptions.replacementCharacter;
     const replacer = options.replacer || DefaultOptions.replacer;
 
-    Storage.createDirectory();
+    await Storage.createDirectory();
+    await Storage.tryDataRecovery(options);
 
     return {
         setItem: (key, value) =>
