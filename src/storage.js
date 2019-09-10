@@ -99,6 +99,13 @@ const generateStorageFileUri = async () => {
 
 const fixedStorageUri = async (secureStoreOptions) => {
     const currentStorageFileUri = await SecureStore.getItemAsync(storageFileUriKey, secureStoreOptions);
-    const fileName = currentStorageFileUri.split('persist-storage/')[1];
-    return `${storageDirectoryUri}${fileName}`;
+    if (currentStorageFileUri) {
+        const components = currentStorageFileUri.split('persist-storage/');
+        if (components.length === 2) {
+            const fileName = components[1];
+            return `${storageDirectoryUri}${fileName}`;
+        }
+    }
+
+    return null;
 };
