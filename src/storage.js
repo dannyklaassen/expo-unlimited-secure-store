@@ -22,7 +22,7 @@ export const getAsync = async (key, secureStoreOptions) => {
             let value = null;
             const aesKey = await SecureStore.getItemAsync(key, secureStoreOptions);
             if (aesKey) {
-                const storageFileUri = await SecureStore.getItemAsync(storageFileUriKey, secureStoreOptions);
+                const storageFileUri = await fixedStorageUri(secureStoreOptions);
                 if (storageFileUri) {
                     const storageString = await FileSystem.readAsStringAsync(storageFileUri);
                     const storage = JSON.parse(storageString);
@@ -41,7 +41,7 @@ export const setAsync = async (key, value, secureStoreOptions) => {
     return new Promise(async (resolve, reject) => {
         try {
             let storage = {};
-            const currentStorageFileUri = await SecureStore.getItemAsync(storageFileUriKey, secureStoreOptions);
+            const currentStorageFileUri = await fixedStorageUri(secureStoreOptions);
             if (currentStorageFileUri) {
                 const storageString = await FileSystem.readAsStringAsync(currentStorageFileUri);
                 storage = JSON.parse(storageString);
@@ -69,7 +69,7 @@ export const setAsync = async (key, value, secureStoreOptions) => {
 export const removeAsync = async (key, secureStoreOptions) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const currentStorageFileUri = await SecureStore.getItemAsync(storageFileUriKey, secureStoreOptions);
+            const currentStorageFileUri = await fixedStorageUri(secureStoreOptions);
             if (currentStorageFileUri) {
                 let storageString = await FileSystem.readAsStringAsync(currentStorageFileUri);
                 storage = JSON.parse(storageString);
@@ -95,4 +95,10 @@ const generateStorageFileUri = async () => {
     const fileName = uuid();
     const uri = `${storageDirectoryUri}${fileName}`;
     return uri;
+};
+
+const fixedStorageUri = async (secureStoreOptions) => {
+    const currentStorageFileUri = await SecureStore.getItemAsync(storageFileUriKey, secureStoreOptions);
+    const fileName = currentStorageFileUri.split('persist-storage/')[1];
+    return `${storageDirectoryUri}${fileName}`;
 };
