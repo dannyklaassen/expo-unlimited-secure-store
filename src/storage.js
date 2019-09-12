@@ -56,7 +56,7 @@ export const setAsync = async (key, value, secureStoreOptions) => {
             await SecureStore.setItemAsync(storageFileUriKey, newStorageFileUri, secureStoreOptions);
             await SecureStore.setItemAsync(key, encryptionKey, secureStoreOptions);
             if (currentStorageFileUri) {
-                await FileSystem.deleteAsync(currentStorageFileUri);
+                await FileSystem.deleteAsync(currentStorageFileUri, { idempotent: true });
             }
             
             resolve();
@@ -79,7 +79,7 @@ export const removeAsync = async (key, secureStoreOptions) => {
                 const newStorageFileUri = await generateStorageFileUri();
                 await FileSystem.writeAsStringAsync(newStorageFileUri, storageString);
                 await SecureStore.setItemAsync(storageFileUriKey, newStorageFileUri, secureStoreOptions);
-                await FileSystem.deleteAsync(currentStorageFileUri);
+                await FileSystem.deleteAsync(currentStorageFileUri, { idempotent: true });
             } 
 
             await SecureStore.deleteItemAsync(key, secureStoreOptions);
