@@ -103,7 +103,11 @@ const fixedStorageUri = async (secureStoreOptions) => {
         const components = currentStorageFileUri.split('persist-storage/');
         if (components.length === 2) {
             const fileName = components[1];
-            return `${storageDirectoryUri}${fileName}`;
+            const uri = `${storageDirectoryUri}${fileName}`;
+            const { exists } = await FileSystem.getInfoAsync(uri);
+            if (exists) {
+                return uri;
+            }
         }
     }
 
