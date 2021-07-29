@@ -1,7 +1,11 @@
+import { keychainAccessibilityConstant} from 'expo-secure-store';
 declare module "@neverdull-agency/expo-unlimited-secure-store" {
+
     export interface Options {
       replacementCharacter?: string;
-      replacer: (key: string, replacementCharacter: string) => string;
+      replacer?: (key: string, replacementCharacter: string) => string;
+      keychainService?: string;
+      keyChainAccessibilityConstant?: KeychainAccessibilityConstant;
     }
   
     export interface ExpoUnlimitedSecureStore {
