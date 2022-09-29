@@ -25,7 +25,12 @@ export const getAsync = async (key, secureStoreOptions) => {
                 const storageFileUri = await fixedStorageUri(secureStoreOptions);
                 if (storageFileUri) {
                     const storageString = await FileSystem.readAsStringAsync(storageFileUri);
-                    const storage = JSON.parse(storageString);
+
+                    let storage = {};
+                    if (storageString) {
+                        storage = JSON.parse(storageString);
+                    }
+
                     const encryptedValue = storage[key];
                     value = AES.decrypt(encryptedValue, aesKey);
                 }
@@ -44,7 +49,10 @@ export const setAsync = async (key, value, secureStoreOptions) => {
             const currentStorageFileUri = await fixedStorageUri(secureStoreOptions);
             if (currentStorageFileUri) {
                 const storageString = await FileSystem.readAsStringAsync(currentStorageFileUri);
-                storage = JSON.parse(storageString);
+
+                if (storageString) {
+                    storage = JSON.parse(storageString);
+                }
             } 
 
             const { encryptionKey, encryptedData } = AES.encryptWithRandomKey(value);
@@ -72,7 +80,12 @@ export const removeAsync = async (key, secureStoreOptions) => {
             const currentStorageFileUri = await fixedStorageUri(secureStoreOptions);
             if (currentStorageFileUri) {
                 let storageString = await FileSystem.readAsStringAsync(currentStorageFileUri);
-                storage = JSON.parse(storageString);
+
+                let storage = {};
+                if (storageString) {
+                    storage = JSON.parse(storageString);
+                }
+
                 delete storage.key;
                 storageString = JSON.stringify(storage);
 
